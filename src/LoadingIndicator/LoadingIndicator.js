@@ -15,10 +15,7 @@ class LoadingIndicator extends PureComponent {
   };
 
   render() {
-    let percComplete;
-    if (this.props.percentComplete && this.props.percentComplete !== 100) {
-      percComplete = `${this.props.percentComplete}%`;
-    }
+    let percComplete = `${this.props.percentComplete}%`;
 
     return (
       <React.Fragment>
@@ -37,6 +34,7 @@ class LoadingIndicator extends PureComponent {
                 Loading... <i className="fa fa-spin fa-circle-o-notch fa-fw" />{' '}
                 {percComplete}
               </p>
+              {percComplete === 100 && <p>Processing...</p>}
             </div>
           </div>
         )}

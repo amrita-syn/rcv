@@ -97,6 +97,7 @@ class CornerstoneViewport extends Component {
       // We can probs grab this once and hold on to? (updated on newImage)
       imageId,
       imageIdIndex, // Maybe
+      imageProgress: 0,
       isLoading: true,
       numImagesLoaded: 0,
       error: null,
@@ -388,9 +389,14 @@ class CornerstoneViewport extends Component {
       this.onNewImage
     );
 
-    // Update our "Images Loaded" count.
-    // Better than nothing?
-    this.element[addOrRemoveEventListener](
+    // Update image load progress
+    cornerstone.events[addOrRemoveEventListener](
+      'cornerstoneimageloadprogress',
+      this.onImageProgress
+    );
+
+    // Update number of images loaded
+    cornerstone.events[addOrRemoveEventListener](
       cornerstone.EVENTS.IMAGE_LOADED,
       this.onImageLoaded
     );
@@ -581,6 +587,12 @@ class CornerstoneViewport extends Component {
     });
   };
 
+  onImageProgress = e => {
+    this.setState({
+      imageProgress: e.detail.percentComplete,
+    });
+  };
+
   imageSliderOnInputCallback = value => {
     this.setViewportActive();
 
@@ -594,9 +606,10 @@ class CornerstoneViewport extends Component {
   };
 
   render() {
+    const { imageIds } = this.props;
     const isLoading = this.state.isLoading;
     const displayLoadingIndicator = isLoading || this.state.error;
-    const scrollbarMax = this.props.imageIds.length - 1;
+    const scrollbarMax = imageIds.length - 1;
     const scrollbarHeight = this.element
       ? `${this.element.clientHeight - 20}px`
       : '100px';
@@ -625,7 +638,10 @@ class CornerstoneViewport extends Component {
           }}
         >
           {displayLoadingIndicator && (
-            <LoadingIndicator error={this.state.error} />
+            <LoadingIndicator
+              error={this.state.error}
+              percentComplete={this.state.imageProgress}
+            />
           )}
           {/* This classname is important in that it tells `cornerstone` to not
            * create a new canvas element when we "enable" the `viewport-element`
